@@ -52,9 +52,8 @@ class TestVerifyBinaries:
 
 class TestWebserverLifecycle:
     def test_start_raises_if_binary_missing(self, zoekt: ZoektLifecycle) -> None:
-        with patch(_FB, return_value=None):
-            with pytest.raises(BinaryNotFoundError, match="zoekt-webserver"):
-                _run(zoekt.start_webserver())
+        with patch(_FB, return_value=None), pytest.raises(BinaryNotFoundError, match="zoekt-webserver"):
+            _run(zoekt.start_webserver())
 
     def test_start_success(self, zoekt: ZoektLifecycle) -> None:
         mock_proc = MagicMock()
@@ -145,9 +144,8 @@ class TestWebserverLifecycle:
 
 class TestIndexRepo:
     def test_raises_if_binary_missing(self, zoekt: ZoektLifecycle) -> None:
-        with patch(_FB, return_value=None):
-            with pytest.raises(BinaryNotFoundError, match="zoekt-index"):
-                _run(zoekt.index_repo(Path("/tmp/some-repo")))
+        with patch(_FB, return_value=None), pytest.raises(BinaryNotFoundError, match="zoekt-index"):
+            _run(zoekt.index_repo(Path("/tmp/some-repo")))
 
     def test_success(self, zoekt: ZoektLifecycle) -> None:
         mock_proc = MagicMock()

@@ -83,7 +83,7 @@ class ZoektLifecycle:
                         f"zoekt-webserver exited immediately (code {self._webserver_process.returncode})",
                         details={"stderr": stderr.decode(errors="replace")},
                     )
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     # Process is still running after 0.5s — that's the success case
                     logger.info(
                         "zoekt-webserver started on port %d (pid %d)",
@@ -122,7 +122,7 @@ class ZoektLifecycle:
         self._webserver_process.terminate()
         try:
             await asyncio.wait_for(self._webserver_process.wait(), timeout=5.0)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             logger.warning("zoekt-webserver did not terminate in 5s, killing")
             self._webserver_process.kill()
             await self._webserver_process.wait()
@@ -170,14 +170,14 @@ class ZoektLifecycle:
                 logger.info("Indexed repo at %s", repo_path)
                 return
 
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 if attempt == 0:
                     logger.warning("zoekt-index timed out for %s, retrying once", repo_path)
                     continue
                 raise CodeIntelError(
                     f"zoekt-index timed out for {repo_path} after {INDEX_TIMEOUT_SECONDS}s",
                     details={"repo_path": str(repo_path)},
-                )
+                ) from None
             except CodeIntelError:
                 if attempt == 0:
                     logger.warning("zoekt-index failed for %s, retrying once", repo_path)

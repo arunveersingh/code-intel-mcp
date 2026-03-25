@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -11,7 +11,6 @@ import pytest
 from code_intel_mcp.errors import RepoAlreadyExistsError, RepoNotFoundError
 from code_intel_mcp.models import IndexStatus, ManagedRepo
 from code_intel_mcp.registry import Registry
-
 
 # ------------------------------------------------------------------
 # Helpers
@@ -90,7 +89,7 @@ class TestLoadSave:
 
     def test_save_round_trip(self, tmp_config_path: Path) -> None:
         reg = Registry(tmp_config_path)
-        repo = _make_repo(last_pull=datetime(2024, 1, 15, 10, 30, tzinfo=timezone.utc))
+        repo = _make_repo(last_pull=datetime(2024, 1, 15, 10, 30, tzinfo=UTC))
         reg.add(repo)
         reg.save()
 
@@ -218,7 +217,7 @@ class TestSerialization:
 
     def test_deserialize_reconstructs_repos(self) -> None:
         original = _make_repo(
-            last_pull=datetime(2024, 6, 1, 12, 0, tzinfo=timezone.utc),
+            last_pull=datetime(2024, 6, 1, 12, 0, tzinfo=UTC),
             index_status=IndexStatus.CURRENT,
         )
         json_str = Registry.serialize([original])

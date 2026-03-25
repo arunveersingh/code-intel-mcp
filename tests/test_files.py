@@ -11,7 +11,6 @@ from code_intel_mcp.files import FileBrowser
 from code_intel_mcp.models import IndexStatus, ManagedRepo
 from code_intel_mcp.registry import Registry
 
-
 # ------------------------------------------------------------------
 # Fixtures
 # ------------------------------------------------------------------

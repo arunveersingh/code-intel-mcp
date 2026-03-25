@@ -8,7 +8,7 @@ from unittest.mock import patch
 import pytest
 
 click = pytest.importorskip("click")
-from click.testing import CliRunner
+from click.testing import CliRunner  # noqa: E402
 
 _FB = "code_intel_mcp.zoekt_installer.find_binary"
 _IS = "code_intel_mcp.zoekt_installer.is_installed"

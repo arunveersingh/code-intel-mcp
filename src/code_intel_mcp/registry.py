@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 
 from code_intel_mcp.errors import RepoAlreadyExistsError, RepoNotFoundError
@@ -158,10 +158,7 @@ class Registry:
         repos: list[ManagedRepo] = []
         for entry in data.get("repos", []):
             last_pull_raw = entry.get("last_pull")
-            if last_pull_raw is not None:
-                last_pull = datetime.fromisoformat(last_pull_raw)
-            else:
-                last_pull = None
+            last_pull = datetime.fromisoformat(last_pull_raw) if last_pull_raw is not None else None
 
             repos.append(
                 ManagedRepo(

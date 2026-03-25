@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from code_intel_mcp.dependencies import DependencyParser
-from code_intel_mcp.models import Dependency, ManagedRepo, IndexStatus
+from code_intel_mcp.models import Dependency, IndexStatus, ManagedRepo
 
 
 @pytest.fixture

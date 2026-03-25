@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-import asyncio
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch, PropertyMock
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -15,11 +14,10 @@ from code_intel_mcp.errors import (
     RepoAlreadyExistsError,
     RepoNotFoundError,
 )
-from code_intel_mcp.git_manager import GitManager, GroupCloneResult, _derive_repo_name
-from code_intel_mcp.models import IndexStatus, ManagedRepo
+from code_intel_mcp.git_manager import GitManager, _derive_repo_name
+from code_intel_mcp.models import ManagedRepo
 from code_intel_mcp.registry import Registry
 from code_intel_mcp.zoekt import ZoektLifecycle
-
 
 # ------------------------------------------------------------------
 # Fixtures
@@ -122,7 +120,7 @@ class TestClone:
         mock_git_repo.head.is_detached = False
 
         with patch("code_intel_mcp.git_manager.git.Repo.clone_from", return_value=mock_git_repo):
-            result = await git_manager.clone(url, ref="develop")
+            await git_manager.clone(url, ref="develop")
 
         mock_git_repo.git.checkout.assert_called_once_with("develop")
 
@@ -150,9 +148,8 @@ class TestClone:
         with patch(
             "code_intel_mcp.git_manager.git.Repo.clone_from",
             side_effect=git.exc.GitCommandError("clone", "fatal: repo not found"),
-        ):
-            with pytest.raises(GitOperationError, match="bad-repo"):
-                await git_manager.clone(url)
+        ), pytest.raises(GitOperationError, match="bad-repo"):
+            await git_manager.clone(url)
 
 
 # ------------------------------------------------------------------
@@ -184,8 +181,6 @@ class TestPull:
         # head.commit returns different shas before and after pull
         mock_git_repo.head.commit = mock_commit_before
 
-        call_count = 0
-        original_hexsha = "aaa"
 
         def pull_side_effect(*args, **kwargs):
             mock_git_repo.head.commit = mock_commit_after
@@ -522,7 +517,7 @@ class TestHelpers:
         )
         git_manager.registry.add(managed)
 
-        ts = datetime(2024, 1, 15, 10, 30, 0, tzinfo=timezone.utc)
+        ts = datetime(2024, 1, 15, 10, 30, 0, tzinfo=UTC)
         mock_commit = MagicMock()
         mock_commit.hexsha = "abc123"
         mock_commit.author = "Test Author"
@@ -771,6 +766,5 @@ class TestCloneGitlabGroup:
         from code_intel_mcp.errors import GitLabAuthError
 
         # No GITLAB_URL / GITLAB_TOKEN set → from_env() should raise
-        with patch.dict(os.environ, {}, clear=True):
-            with pytest.raises(GitLabAuthError, match="GITLAB_URL"):
-                await git_manager.clone_gitlab_group("some/group")
+        with patch.dict(os.environ, {}, clear=True), pytest.raises(GitLabAuthError, match="GITLAB_URL"):
+            await git_manager.clone_gitlab_group("some/group")

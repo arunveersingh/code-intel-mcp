@@ -98,10 +98,7 @@ class SearchService:
                 line_number = lm.get("LineNumber", 0)
                 content = lm.get("Line", "")
 
-                if isinstance(content, str):
-                    line_text = content
-                else:
-                    line_text = str(content)
+                line_text = content if isinstance(content, str) else str(content)
 
                 context_before: list[str] = []
                 context_after: list[str] = []
@@ -130,10 +127,7 @@ class SearchService:
             # Also handle ChunkMatches (newer Zoekt format)
             for cm in fm.get("ChunkMatches") or []:
                 content_text = cm.get("Content", "")
-                if isinstance(content_text, str):
-                    line_text = content_text.rstrip("\n")
-                else:
-                    line_text = str(content_text)
+                line_text = content_text.rstrip("\n") if isinstance(content_text, str) else str(content_text)
 
                 content_start = cm.get("ContentStart", {})
                 line_number = content_start.get("LineNumber", 0)

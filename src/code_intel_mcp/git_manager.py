@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+import contextlib
 import logging
 import os
 import shutil
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -158,10 +159,7 @@ class GitManager:
             try:
                 git_repo.git.checkout(ref)
                 # Update current_ref after checkout
-                if git_repo.head.is_detached:
-                    current_ref = git_repo.head.commit.hexsha
-                else:
-                    current_ref = git_repo.active_branch.name
+                current_ref = git_repo.head.commit.hexsha if git_repo.head.is_detached else git_repo.active_branch.name
             except git.exc.GitCommandError as exc:
                 raise GitOperationError(
                     f"Failed to checkout ref '{ref}' in '{repo_name}': {exc}",
@@ -287,7 +285,7 @@ class GitManager:
                 details={"repo_name": repo_name},
             ) from exc
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         self.registry.update(repo_name, last_pull=now)
         self.registry.save()
 
@@ -320,10 +318,7 @@ class GitManager:
             ) from exc
 
         # Determine new ref
-        if git_repo.head.is_detached:
-            new_ref = git_repo.head.commit.hexsha
-        else:
-            new_ref = git_repo.active_branch.name
+        new_ref = git_repo.head.commit.hexsha if git_repo.head.is_detached else git_repo.active_branch.name
 
         self.registry.update(repo_name, current_ref=new_ref)
         self.registry.save()
@@ -445,8 +440,6 @@ class GitManager:
         for dirpath, _dirnames, filenames in os.walk(local_path):
             for fname in filenames:
                 fpath = os.path.join(dirpath, fname)
-                try:
+                with contextlib.suppress(OSError):
                     total += os.path.getsize(fpath)
-                except OSError:
-                    pass
         return total

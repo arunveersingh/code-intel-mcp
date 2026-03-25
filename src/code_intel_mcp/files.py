@@ -50,7 +50,7 @@ class FileBrowser:
             raise CodeIntelFileNotFoundError(
                 f"Path '{relative}' is outside the repository.",
                 details={"path": relative},
-            )
+            ) from None
         return resolved
 
     # ------------------------------------------------------------------

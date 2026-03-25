@@ -39,7 +39,7 @@ def serve() -> None:
 )
 def setup(zoekt_url: str | None) -> None:
     """Create directories, verify dependencies, and auto-install Zoekt if needed."""
-    from code_intel_mcp.zoekt_installer import find_binary, install, is_installed
+    from code_intel_mcp.zoekt_installer import find_binary, install
 
     click.echo("code-intel-mcp setup")
     click.echo("=" * 40)

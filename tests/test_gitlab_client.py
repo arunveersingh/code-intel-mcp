@@ -6,14 +6,12 @@ not need httpx installed — the production code imports it.
 
 from __future__ import annotations
 
-import json
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
 from code_intel_mcp.errors import GitLabAuthError, GitLabError, GitLabNotFoundError
 from code_intel_mcp.gitlab_client import GitLabClient
-
 
 # ------------------------------------------------------------------
 # Helpers
