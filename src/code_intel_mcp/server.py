@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 from contextlib import asynccontextmanager
 from dataclasses import asdict
 from datetime import datetime
@@ -49,6 +50,12 @@ dep_parser: DependencyParser | None = None
 async def lifespan(server: FastMCP):
     """Initialise and tear down all service layers."""
     global registry, zoekt, git_manager, search_service, file_browser, dep_parser
+
+    # Ensure ~/.code-intel-mcp/bin is on PATH so Zoekt binaries are found
+    bin_dir = str(_BASE_DIR / "bin")
+    current_path = os.environ.get("PATH", "")
+    if bin_dir not in current_path:
+        os.environ["PATH"] = bin_dir + os.pathsep + current_path
 
     _REPO_STORE.mkdir(parents=True, exist_ok=True)
     _INDEX_DIR.mkdir(parents=True, exist_ok=True)
