@@ -7,65 +7,57 @@
 
 MCP server that gives AI agents deep code understanding across multiple git repositories. Combines git lifecycle management, [Zoekt](https://github.com/sourcegraph/zoekt)-based trigram code search, and cross-repo dependency analysis.
 
-## Quick Start
+## Quick Start (macOS)
 
-### 1. Install & Setup
+### Prerequisites
+
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/) (Python package runner):
 
 ```bash
-# Install
-pip install code-intel-mcp
-
-# Setup (creates directories, installs Zoekt binaries)
-code-intel-mcp setup --zoekt-url "https://github.com/arunveersingh/code-intel-mcp/releases/download/v0.1.0"
+brew install uv
 ```
 
-Or with `uvx` (no install needed):
+### 1. Setup (one time)
 
 ```bash
 uvx code-intel-mcp setup --zoekt-url "https://github.com/arunveersingh/code-intel-mcp/releases/download/v0.1.0"
 ```
 
+This creates `~/.code-intel-mcp/` directories and downloads the Zoekt search engine binaries.
+
 ### 2. Add to your MCP client
 
-**Kiro** — add to `~/.kiro/settings/mcp.json`:
+**Kiro** — add to `~/.kiro/settings/mcp.json` inside `"mcpServers"`:
 
 ```json
-{
-  "mcpServers": {
-    "code-intel-mcp": {
-      "command": "uvx",
-      "args": ["code-intel-mcp", "serve"],
-      "env": {
-        "GITLAB_URL": "https://your-gitlab.com",
-        "GITLAB_TOKEN": "<your-token>",
-        "PATH": "~/.code-intel-mcp/bin:/usr/local/bin:/usr/bin:/bin"
-      }
-    }
+"code-intel-mcp": {
+  "command": "uvx",
+  "args": ["code-intel-mcp", "serve"],
+  "env": {
+    "GITLAB_URL": "https://your-gitlab.com",
+    "GITLAB_TOKEN": "<your-personal-access-token>"
+  },
+  "disabled": false,
+  "autoApprove": []
+}
+```
+
+**Claude Desktop** — add to `~/Library/Application Support/Claude/claude_desktop_config.json` inside `"mcpServers"`:
+
+```json
+"code-intel-mcp": {
+  "command": "uvx",
+  "args": ["code-intel-mcp", "serve"],
+  "env": {
+    "GITLAB_URL": "https://your-gitlab.com",
+    "GITLAB_TOKEN": "<your-personal-access-token>"
   }
 }
 ```
 
-**Claude Desktop** — add to `claude_desktop_config.json`:
+### 3. Done
 
-```json
-{
-  "mcpServers": {
-    "code-intel-mcp": {
-      "command": "uvx",
-      "args": ["code-intel-mcp", "serve"],
-      "env": {
-        "GITLAB_URL": "https://your-gitlab.com",
-        "GITLAB_TOKEN": "<your-token>",
-        "PATH": "~/.code-intel-mcp/bin:/usr/local/bin:/usr/bin:/bin"
-      }
-    }
-  }
-}
-```
-
-### 3. Use it
-
-Your AI agent now has access to 15 tools for code intelligence.
+Restart your MCP client. Your AI agent now has access to 15 tools for code intelligence.
 
 ## Features
 
@@ -102,7 +94,6 @@ Your AI agent now has access to 15 tools for code intelligence.
 |----------|----------|-------------|
 | `GITLAB_URL` | For GitLab features | Base URL of your GitLab instance |
 | `GITLAB_TOKEN` | For GitLab features | Personal access token with `read_api` scope |
-| `ZOEKT_BINARY_URL` | For auto-install | URL prefix for Zoekt binary downloads |
 
 ## How It Works
 
@@ -116,7 +107,15 @@ The server manages a local repository store at `~/.code-intel-mcp/`:
 └── config.json  # Registry of managed repos
 ```
 
-Every git mutation (clone, pull, checkout) automatically triggers Zoekt re-indexing, keeping search results current.
+Every git mutation (clone, pull, checkout) automatically triggers Zoekt re-indexing, keeping search results current. The server auto-prepends `~/.code-intel-mcp/bin` to PATH on startup, so no manual PATH configuration is needed.
+
+## Troubleshooting
+
+**`spawn code-intel-mcp ENOENT`** — Use `"command": "uvx"` with `"args": ["code-intel-mcp", "serve"]`, not `"command": "code-intel-mcp"`.
+
+**`Requires-Python >=3.11`** — Use `uvx` instead of `pip install`. It handles Python versions automatically.
+
+**Zoekt binaries not found** — Re-run setup: `uvx code-intel-mcp setup --zoekt-url "https://github.com/arunveersingh/code-intel-mcp/releases/download/v0.1.0"`
 
 ## Development
 
