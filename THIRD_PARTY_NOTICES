@@ -1,0 +1,15 @@
+Third-Party Software Notices
+============================
+
+This project includes pre-built binaries of Zoekt, distributed as
+GitHub Release assets.
+
+Zoekt
+-----
+- Source: https://github.com/sourcegraph/zoekt
+- License: Apache License 2.0
+- Copyright: Copyright 2016 Google Inc. All Rights Reserved.
+             Copyright 2021 Sourcegraph Inc. All Rights Reserved.
+
+The full text of the Apache License 2.0 is available at:
+https://www.apache.org/licenses/LICENSE-2.0
